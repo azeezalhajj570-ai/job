@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Recruitment Fraud Detection{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: "#eef4ff",
+                            100: "#dce8ff",
+                            500: "#356dff",
+                            600: "#2858d6",
+                            700: "#2247ad"
+                        },
+                        canvas: "#f3f6fb",
+                        success: "#1f9d63",
+                        danger: "#dc4c64"
+                    },
+                    boxShadow: {
+                        glow: "0 20px 45px rgba(37, 99, 235, 0.12)"
+                    },
+                    fontFamily: {
+                        sans: ["Segoe UI", "ui-sans-serif", "system-ui", "sans-serif"]
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-screen bg-canvas text-slate-900 antialiased">
+    <div class="absolute inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(circle_at_top,rgba(53,109,255,0.18),transparent_55%)]"></div>
+
+    <nav class="border-b border-slate-200/80 bg-white/80 backdrop-blur-md">
+        <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
+            <a href="{{ url_for('index') }}" class="flex items-center gap-3">
+                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-500 text-lg font-bold text-white shadow-glow">RF</div>
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">ML Security</p>
+                    <h1 class="text-lg font-semibold text-slate-900">Recruitment Fraud Detection</h1>
+                </div>
+            </a>
+            <div class="flex items-center gap-3">
+                <a href="{{ url_for('index') }}" class="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">Predict</a>
+                <a href="{{ url_for('dashboard') }}" class="rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-6 space-y-3">
+                    {% for category, message in messages %}
+                        <div class="rounded-2xl border px-4 py-3 text-sm shadow-sm {% if category == 'error' %}border-red-200 bg-red-50 text-red-700{% else %}border-emerald-200 bg-emerald-50 text-emerald-700{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
