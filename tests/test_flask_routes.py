@@ -67,6 +67,8 @@ def test_user_signup_signin_and_prediction_flow(app_module):
     client = flask_app.test_client()
 
     create_user_account(client, "/signup")
+    overview_response = client.get("/overview", follow_redirects=True)
+    signals_response = client.get("/signals", follow_redirects=True)
     prediction_response = client.post(
         "/predict",
         data={"job_text": "Urgent work from home role. Payment required to start."},
@@ -74,6 +76,10 @@ def test_user_signup_signin_and_prediction_flow(app_module):
     )
     dashboard_response = client.get("/dashboard", follow_redirects=True)
 
+    assert overview_response.status_code == 200
+    assert b"How It Works" in overview_response.data
+    assert signals_response.status_code == 200
+    assert b"Common Detection Signals" in signals_response.data
     assert prediction_response.status_code == 200
     assert b"Fraudulent" in prediction_response.data
     assert b"DummyRouteModel" in prediction_response.data
@@ -98,6 +104,6 @@ def test_admin_signup_signin_and_dashboard_access(app_module):
     dashboard_response = client.get("/dashboard", follow_redirects=True)
 
     assert response.status_code == 200
-    assert b"Prediction activity and fraud monitoring" in response.data
+    assert b"Recent Predictions" in response.data
     assert dashboard_response.status_code == 200
     assert b"Recent Predictions" in dashboard_response.data

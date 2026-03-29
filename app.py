@@ -126,7 +126,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
 
     def handle_signup(role: str) -> str:
         if g.current_user is not None:
-            return redirect(url_for("index"))
+            return redirect(url_for("overview"))
 
         if request.method == "POST":
             full_name = (request.form.get("full_name") or "").strip()
@@ -151,7 +151,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
                 session.clear()
                 session["user_id"] = user_id
                 flash("Account created successfully.", "success")
-                return redirect(url_for("dashboard" if role == "admin" else "index"))
+                return redirect(url_for("dashboard" if role == "admin" else "overview"))
 
         return render_template(
             "auth.html",
@@ -162,7 +162,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
 
     def handle_signin(role: str) -> str:
         if g.current_user is not None and g.current_user["role"] == role:
-            return redirect(url_for("dashboard" if role == "admin" else "index"))
+            return redirect(url_for("dashboard" if role == "admin" else "overview"))
 
         if request.method == "POST":
             email = (request.form.get("email") or "").strip().lower()
@@ -177,7 +177,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
                 session.clear()
                 session["user_id"] = user["id"]
                 flash("Signed in successfully.", "success")
-                return redirect(url_for("dashboard" if role == "admin" else "index"))
+                return redirect(url_for("dashboard" if role == "admin" else "overview"))
 
         return render_template(
             "auth.html",
@@ -189,7 +189,16 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     @app.route("/")
     @login_required
     def home_redirect() -> str:
-        return redirect(url_for("index"))
+        return redirect(url_for("overview"))
+
+    @app.route("/overview")
+    @login_required
+    def overview() -> str:
+        return render_template(
+            "overview.html",
+            model_report=model_report,
+            model_ready=predictor is not None,
+        )
 
     @app.route("/predict", methods=["GET", "POST"])
     @login_required
@@ -225,6 +234,11 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
             model_report=model_report,
             demo_examples=app.config["DEMO_EXAMPLES"],
         )
+
+    @app.route("/signals")
+    @login_required
+    def signals() -> str:
+        return render_template("signals.html")
 
     @app.route("/api/predict", methods=["POST"])
     @login_required

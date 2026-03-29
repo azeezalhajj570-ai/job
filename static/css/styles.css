@@ -7,15 +7,16 @@ button,
 input,
 select,
 textarea {
-    font-family: "Poppins", ui-sans-serif, system-ui, sans-serif;
+    font-family: "Nunito", sans-serif;
 }
 
-body {
-    color: #182033;
+textarea:focus,
+input:focus {
+    outline: none;
 }
 
-textarea::placeholder {
-    color: #94a3b8;
+.conf-fill {
+    transition: width 0.5s ease;
 }
 
 canvas {
@@ -23,12 +24,16 @@ canvas {
 }
 
 ::selection {
-    background: rgba(49, 89, 214, 0.18);
-    color: #182033;
+    background: rgba(37, 99, 235, 0.18);
+    color: #1f2937;
 }
 
 @media (prefers-reduced-motion: reduce) {
     html {
         scroll-behavior: auto;
+    }
+
+    .conf-fill {
+        transition: none;
     }
 }

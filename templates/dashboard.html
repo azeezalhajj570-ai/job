@@ -3,108 +3,114 @@
 {% block title %}Dashboard | Recruitment Fraud Detection{% endblock %}
 
 {% block content %}
-<section class="space-y-6">
-    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-soft">
-        <p class="text-sm font-semibold text-brand-600">Project Dashboard</p>
-        <h2 class="mt-2 text-3xl font-semibold text-ink">Prediction activity and fraud monitoring</h2>
-        <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-            This page summarizes the prediction history stored by the system. It is designed like a final-year project dashboard where students can present key outputs, fraud rate, and recent test cases to supervisors and examiners.
-        </p>
-    </div>
+<div class="mb-8">
+    <h1 class="text-2xl font-extrabold text-gray-900 sm:text-3xl">Dashboard</h1>
+    <p class="mt-2 text-sm text-gray-500">Monitor prediction activity, fraud detection rate, and recent analyzed job postings.</p>
+</div>
 
-    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-soft">
-            <p class="text-sm text-slate-500">Total analyzed jobs</p>
-            <p class="mt-3 text-3xl font-semibold text-ink">{{ metrics.total_jobs }}</p>
-        </div>
-        <div class="rounded-xl border border-red-100 bg-white p-5 shadow-soft">
-            <p class="text-sm text-slate-500">Fraud count</p>
-            <p class="mt-3 text-3xl font-semibold text-danger">{{ metrics.fraud_count }}</p>
-        </div>
-        <div class="rounded-xl border border-emerald-100 bg-white p-5 shadow-soft">
-            <p class="text-sm text-slate-500">Legitimate count</p>
-            <p class="mt-3 text-3xl font-semibold text-success">{{ metrics.legitimate_count }}</p>
-        </div>
-        <div class="rounded-xl border border-brand-100 bg-white p-5 shadow-soft">
-            <p class="text-sm text-slate-500">Fraud rate</p>
-            <p class="mt-3 text-3xl font-semibold text-brand-600">{{ metrics.fraud_rate }}%</p>
-        </div>
+<div class="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+    <div class="rounded-xl border border-gray-200 bg-white p-5 text-center shadow-sm">
+        <div class="text-3xl font-extrabold text-gray-900 sm:text-4xl">{{ metrics.total_jobs }}</div>
+        <div class="mt-1 text-sm font-bold uppercase tracking-wide text-gray-400">Total Analyzed</div>
     </div>
+    <div class="rounded-xl border border-gray-200 bg-white p-5 text-center shadow-sm">
+        <div class="text-3xl font-extrabold text-red-600 sm:text-4xl">{{ metrics.fraud_count }}</div>
+        <div class="mt-1 text-sm font-bold uppercase tracking-wide text-gray-400">Fraud Detected</div>
+    </div>
+    <div class="rounded-xl border border-gray-200 bg-white p-5 text-center shadow-sm">
+        <div class="text-3xl font-extrabold text-green-600 sm:text-4xl">{{ metrics.legitimate_count }}</div>
+        <div class="mt-1 text-sm font-bold uppercase tracking-wide text-gray-400">Legitimate</div>
+    </div>
+    <div class="rounded-xl border border-gray-200 bg-white p-5 text-center shadow-sm">
+        <div class="text-3xl font-extrabold text-blue-600 sm:text-4xl">{{ metrics.fraud_rate }}%</div>
+        <div class="mt-1 text-sm font-bold uppercase tracking-wide text-gray-400">Fraud Rate</div>
+    </div>
+</div>
 
-    <div class="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-soft">
-            <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-ink">Prediction Distribution</h3>
-                <span class="rounded-md bg-slate-100 px-3 py-1 text-xs text-slate-600">Chart.js</span>
-            </div>
-            <div class="mt-5 h-72">
+<div class="mb-6 grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
+    <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div class="flex items-center gap-3 rounded-t-xl border-b border-gray-200 bg-gray-50 px-6 py-4 text-sm font-extrabold text-gray-700">
+            <span class="text-lg text-blue-600">•</span>
+            Prediction Distribution
+        </div>
+        <div class="p-6">
+            <div class="h-80">
                 <canvas id="predictionChart" data-fraud="{{ chart_data['Fraudulent'] }}" data-legit="{{ chart_data['Legitimate'] }}"></canvas>
             </div>
-            <div class="mt-5 grid gap-3 sm:grid-cols-2">
-                <div class="rounded-lg bg-red-50 p-4">
-                    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-red-600">Fraudulent</p>
-                    <p class="mt-2 text-2xl font-semibold text-ink">{{ chart_data['Fraudulent'] }}</p>
+            <div class="mt-5 grid grid-cols-2 gap-4">
+                <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-center">
+                    <div class="text-2xl font-extrabold text-red-600">{{ chart_data['Fraudulent'] }}</div>
+                    <div class="text-sm font-bold uppercase tracking-wide text-red-500">Fraudulent</div>
                 </div>
-                <div class="rounded-lg bg-emerald-50 p-4">
-                    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-600">Legitimate</p>
-                    <p class="mt-2 text-2xl font-semibold text-ink">{{ chart_data['Legitimate'] }}</p>
+                <div class="rounded-lg border border-green-200 bg-green-50 p-4 text-center">
+                    <div class="text-2xl font-extrabold text-green-700">{{ chart_data['Legitimate'] }}</div>
+                    <div class="text-sm font-bold uppercase tracking-wide text-green-600">Legitimate</div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-soft">
-            <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-ink">Recent Predictions</h3>
-                <span class="rounded-md bg-slate-100 px-3 py-1 text-xs text-slate-600">Latest 10</span>
+    <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div class="flex items-center justify-between rounded-t-xl border-b border-gray-200 bg-gray-50 px-6 py-4 text-sm font-extrabold text-gray-700">
+            <div class="flex items-center gap-3">
+                <span class="text-lg text-blue-600">•</span>
+                Recent Predictions
             </div>
-            <div class="mt-5 overflow-x-auto">
-                <table class="min-w-full text-left text-sm">
-                    <thead>
-                        <tr class="border-b border-slate-200 text-slate-500">
-                            <th class="pb-3 pr-4 font-medium">ID</th>
-                            <th class="pb-3 pr-4 font-medium">Preview</th>
-                            <th class="pb-3 pr-4 font-medium">Label</th>
-                            <th class="pb-3 pr-4 font-medium">Confidence</th>
-                            <th class="pb-3 font-medium">Time</th>
+            <span class="text-sm text-gray-400">Latest 10</span>
+        </div>
+        <div class="overflow-x-auto p-6">
+            <table class="min-w-full text-left text-sm">
+                <thead>
+                    <tr class="border-b border-gray-200 text-gray-500">
+                        <th class="pb-4 pr-4 font-bold">ID</th>
+                        <th class="pb-4 pr-4 font-bold">Preview</th>
+                        <th class="pb-4 pr-4 font-bold">Label</th>
+                        <th class="pb-4 pr-4 font-bold">Confidence</th>
+                        <th class="pb-4 font-bold">Time</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for item in recent_predictions %}
+                        <tr class="align-top">
+                            <td class="py-4 pr-4 font-bold text-gray-800">{{ item.id }}</td>
+                            <td class="py-4 pr-4 text-gray-600">{{ item.job_text[:90] }}{% if item.job_text|length > 90 %}...{% endif %}</td>
+                            <td class="py-4 pr-4">
+                                <span class="rounded-full px-3 py-1.5 text-xs font-extrabold uppercase tracking-wide {% if item.predicted_label == 'Fraudulent' %}border border-red-200 bg-red-100 text-red-600{% else %}border border-green-200 bg-green-100 text-green-700{% endif %}">
+                                    {{ item.predicted_label }}
+                                </span>
+                            </td>
+                            <td class="py-4 pr-4 font-semibold text-gray-700">{{ item.confidence }}%</td>
+                            <td class="py-4 text-gray-500">{{ item.created_at }}</td>
                         </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        {% for item in recent_predictions %}
-                            <tr class="align-top">
-                                <td class="py-4 pr-4 font-medium text-ink">{{ item.id }}</td>
-                                <td class="py-4 pr-4 text-slate-600">{{ item.job_text[:95] }}{% if item.job_text|length > 95 %}...{% endif %}</td>
-                                <td class="py-4 pr-4">
-                                    <span class="rounded-md px-3 py-1 text-xs font-semibold {% if item.predicted_label == 'Fraudulent' %}bg-red-50 text-red-700{% else %}bg-emerald-50 text-emerald-700{% endif %}">
-                                        {{ item.predicted_label }}
-                                    </span>
-                                </td>
-                                <td class="py-4 pr-4 text-slate-700">{{ item.confidence }}%</td>
-                                <td class="py-4 text-slate-500">{{ item.created_at }}</td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="5" class="py-8 text-center text-slate-500">No predictions saved yet. Use the prediction page first.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="py-10 text-center text-sm text-gray-400">No predictions saved yet. Use the prediction page first.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <div class="grid gap-4 md:grid-cols-3">
-        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-soft">
-            <p class="text-sm font-semibold text-brand-600">Method</p>
-            <p class="mt-2 text-sm leading-6 text-slate-600">The system preprocesses job descriptions, converts text into TF-IDF features, and applies machine learning classification.</p>
+<div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div class="flex items-center gap-3 rounded-t-xl border-b border-gray-200 bg-gray-50 px-6 py-4 text-sm font-extrabold text-gray-700">
+        <span class="text-lg text-blue-600">•</span>
+        Dashboard Notes
+    </div>
+    <div class="grid gap-4 p-6 md:grid-cols-3">
+        <div class="rounded-lg bg-gray-50 p-4">
+            <div class="mb-2 text-sm font-extrabold uppercase tracking-wide text-gray-600">Method</div>
+            <p class="text-sm leading-7 text-gray-500">Predictions are generated from cleaned text using TF-IDF features and the trained classifier.</p>
         </div>
-        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-soft">
-            <p class="text-sm font-semibold text-brand-600">Purpose</p>
-            <p class="mt-2 text-sm leading-6 text-slate-600">The dashboard helps monitor how many suspicious posts were detected and supports project evaluation during presentation.</p>
+        <div class="rounded-lg bg-gray-50 p-4">
+            <div class="mb-2 text-sm font-extrabold uppercase tracking-wide text-gray-600">Storage</div>
+            <p class="text-sm leading-7 text-gray-500">Each analyzed job posting is stored with its label, confidence score, and timestamp.</p>
         </div>
-        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-soft">
-            <p class="text-sm font-semibold text-brand-600">Tools Used</p>
-            <p class="mt-2 text-sm leading-6 text-slate-600">Flask for the web app, Tailwind CSS for layout, Chart.js for graphs, and scikit-learn for the predictive models.</p>
+        <div class="rounded-lg bg-gray-50 p-4">
+            <div class="mb-2 text-sm font-extrabold uppercase tracking-wide text-gray-600">Usage</div>
+            <p class="text-sm leading-7 text-gray-500">Use this page to review trends, compare outcomes, and inspect the latest prediction history.</p>
         </div>
     </div>
-</section>
+</div>
 {% endblock %}

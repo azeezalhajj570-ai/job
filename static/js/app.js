@@ -35,8 +35,19 @@ document.addEventListener("DOMContentLoaded", () => {
             textarea.style.height = `${Math.max(textarea.scrollHeight, 220)}px`;
         };
 
-        textarea.addEventListener("input", resizeTextarea);
+        const updateCounter = () => {
+            const counter = document.getElementById("char-count");
+            if (counter) {
+                counter.textContent = String(textarea.value.length);
+            }
+        };
+
+        textarea.addEventListener("input", () => {
+            resizeTextarea();
+            updateCounter();
+        });
         resizeTextarea();
+        updateCounter();
     }
 
     const chartCanvas = document.getElementById("predictionChart");
@@ -75,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             padding: 16,
                             color: "#334155",
                             font: {
-                                family: "Poppins",
+                                family: "Nunito",
                                 size: 12
                             }
                         }
