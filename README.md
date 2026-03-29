@@ -8,9 +8,12 @@ This project implements the proposal as a complete Flask application backed by a
 - TF-IDF feature extraction with unigram and bigram support
 - Model comparison across Logistic Regression, Naive Bayes, SVM, and Random Forest
 - Automatic best-model selection using F1 score, cross-validation support, and stored evaluation metrics
-- Flask prediction interface for end users
+- Flask web application with shared sign-in, role-based redirects, and user/admin accounts
+- Multi-page frontend with Overview, Predict, Signals, and Dashboard pages
+- Responsive Tailwind CSS interface with a mobile sidebar menu and desktop top navigation
 - Monitoring dashboard for administrators with fraud rate, confidence averages, model usage, and recent activity
 - SQLite logging of every analyzed posting
+- Generated graduation documentation in `.docx` format with diagrams and chaptered report content
 - Automated tests for preprocessing, persistence, prediction, and Flask routes
 
 ## Project structure
@@ -70,8 +73,22 @@ python app.py
 
 Open:
 
-- `http://127.0.0.1:5000/` for prediction
-- `http://127.0.0.1:5000/dashboard` for monitoring
+- `http://127.0.0.1:5000/` redirects to the correct page after sign-in
+- `http://127.0.0.1:5000/signin` for shared sign in
+- `http://127.0.0.1:5000/signup` for user sign up
+- `http://127.0.0.1:5000/admin/signup` for admin sign up
+
+Main application pages:
+
+- `/overview` for system summary and quick metrics
+- `/predict` for job-post classification
+- `/signals` for fraud and legitimate content indicators
+- `/dashboard` for admin monitoring
+
+Demo accounts:
+
+- User: `user` / `user`
+- Admin: `admin` / `admin`
 
 ## Run tests
 
@@ -84,9 +101,21 @@ pytest
 The implementation maps directly to the proposal:
 
 - Intelligent job post analysis: NLP preprocessing, TF-IDF, and multiple ML classifiers
-- Web-based prediction platform: Flask UI for manual prediction and JSON API support
-- Fraud detection monitoring dashboard: summary metrics, chart data, model usage, and recent predictions
+- Web-based prediction platform: Flask UI for manual prediction, shared authentication, multi-page navigation, and JSON API support
+- Fraud detection monitoring dashboard: summary metrics, chart data, model usage, recent predictions, and admin-only access
 - Quality assurance: automated tests plus cross-validation metrics in the training workflow
+
+## Documentation
+
+The graduation report is generated at:
+
+- `docs/Recruitment_Fraud_Detection_Graduation_Report.docx`
+
+Regenerate it with:
+
+```bash
+python scripts/generate_graduation_report.py
+```
 
 ## Future extensions
 

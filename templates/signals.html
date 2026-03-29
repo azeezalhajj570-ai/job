@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Signals | Recruitment Fraud Detection{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-extrabold text-gray-900 sm:text-3xl">Detection Signals</h1>
+    <p class="mt-2 text-sm text-gray-500">Review common text patterns that usually appear in suspicious or legitimate job advertisements.</p>
+</div>
+
+<div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div class="flex items-center gap-3 rounded-t-xl border-b border-gray-200 bg-gray-50 px-6 py-4 text-sm font-extrabold text-gray-700">
+        <span class="text-lg text-blue-600">•</span>
+        Common Detection Signals
+    </div>
+    <div class="p-6">
+        <p class="mb-4 text-sm text-gray-400">These are general language patterns that often appear in suspicious or legitimate job posts.</p>
+        <div class="grid gap-6 sm:grid-cols-2">
+            <div>
+                <div class="mb-3 text-sm font-extrabold uppercase tracking-wide text-red-600">Fraud Indicators</div>
+                <ul class="space-y-2">
+                    <li class="flex gap-3 text-sm text-gray-600"><span class="font-extrabold text-red-500">✗</span>Urgent language or pressure to apply immediately</li>
+                    <li class="flex gap-3 text-sm text-gray-600"><span class="font-extrabold text-red-500">✗</span>Requests for bank details or identity documents too early</li>
+                    <li class="flex gap-3 text-sm text-gray-600"><span class="font-extrabold text-red-500">✗</span>Advance payment or processing fees</li>
+                    <li class="flex gap-3 text-sm text-gray-600"><span class="font-extrabold text-red-500">✗</span>Unrealistic salary promises</li>
+                    <li class="flex gap-3 text-sm text-gray-600"><span class="font-extrabold text-red-500">✗</span>Vague employer information</li>
+                </ul>
+            </div>
+            <div>
+                <div class="mb-3 text-sm font-extrabold uppercase tracking-wide text-green-600">Legitimate Indicators</div>
+                <ul class="space-y-2">
+                    <li class="flex gap-3 text-sm text-gray-600"><span class="font-extrabold text-green-600">✓</span>Clear job responsibilities and requirements</li>
+                    <li class="flex gap-3 text-sm text-gray-600"><span class="font-extrabold text-green-600">✓</span>Named company with verifiable details</li>
+                    <li class="flex gap-3 text-sm text-gray-600"><span class="font-extrabold text-green-600">✓</span>Standard application process</li>
+                    <li class="flex gap-3 text-sm text-gray-600"><span class="font-extrabold text-green-600">✓</span>Realistic compensation range</li>
+                    <li class="flex gap-3 text-sm text-gray-600"><span class="font-extrabold text-green-600">✓</span>Professional and consistent language</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

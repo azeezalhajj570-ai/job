@@ -14,6 +14,18 @@ def initialize_database(database_path: str) -> None:
     with get_connection(database_path) as connection:
         connection.execute(
             """
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                full_name TEXT NOT NULL,
+                email TEXT NOT NULL UNIQUE,
+                password_hash TEXT NOT NULL,
+                role TEXT NOT NULL CHECK(role IN ('user', 'admin')),
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+            """
+        )
+        connection.execute(
+            """
             CREATE TABLE IF NOT EXISTS predictions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 job_text TEXT NOT NULL,
@@ -38,6 +50,68 @@ def initialize_database(database_path: str) -> None:
                 "ALTER TABLE predictions ADD COLUMN input_length INTEGER NOT NULL DEFAULT 0"
             )
         connection.commit()
+
+
+def create_user(
+    database_path: str,
+    full_name: str,
+    email: str,
+    password_hash: str,
+    role: str,
+) -> int:
+    with get_connection(database_path) as connection:
+        cursor = connection.execute(
+            """
+            INSERT INTO users (full_name, email, password_hash, role)
+            VALUES (?, ?, ?, ?)
+            """,
+            (full_name, email.lower().strip(), password_hash, role),
+        )
+        connection.commit()
+        return int(cursor.lastrowid)
+
+
+def get_user_by_email(database_path: str, email: str) -> dict[str, Any] | None:
+    with get_connection(database_path) as connection:
+        row = connection.execute(
+            """
+            SELECT id, full_name, email, password_hash, role, created_at
+            FROM users
+            WHERE email = ?
+            """,
+            (email.lower().strip(),),
+        ).fetchone()
+    return dict(row) if row else None
+
+
+def get_user_by_id(database_path: str, user_id: int) -> dict[str, Any] | None:
+    with get_connection(database_path) as connection:
+        row = connection.execute(
+            """
+            SELECT id, full_name, email, password_hash, role, created_at
+            FROM users
+            WHERE id = ?
+            """,
+            (user_id,),
+        ).fetchone()
+    return dict(row) if row else None
+
+
+def ensure_demo_user(
+    database_path: str,
+    full_name: str,
+    email: str,
+    password_hash: str,
+    role: str,
+) -> None:
+    if get_user_by_email(database_path, email) is None:
+        create_user(
+            database_path=database_path,
+            full_name=full_name,
+            email=email,
+            password_hash=password_hash,
+            role=role,
+        )
 
 
 def insert_prediction(

@@ -20,6 +20,8 @@ class DummyPredictionService:
             "confidence": confidence,
             "model_name": "DummyRouteModel",
             "cleaned_text": text.lower(),
+            "risk_summary": [],
+            "supporting_terms": [],
         }
 
 
@@ -34,25 +36,74 @@ def app_module(monkeypatch, tmp_path):
     return module
 
 
-def test_flask_routes_support_prediction_api_and_dashboard(app_module):
-    flask_app = app_module.create_app()
+def create_user_account(client, path: str, **extra_fields) -> None:
+    payload = {
+        "full_name": "Student User",
+        "email": "student@example.com",
+        "password": "password123",
+    }
+    payload.update(extra_fields)
+    response = client.post(path, data=payload, follow_redirects=True)
+    assert response.status_code == 200
+
+
+def test_user_routes_require_authentication(app_module):
+    flask_app = app_module.create_app({"ADMIN_SIGNUP_CODE": "secret-admin"})
     client = flask_app.test_client()
 
-    index_response = client.post(
-        "/",
-        data={"job_text": "Urgent work from home role. Payment required to start."},
-    )
-    api_response = client.post(
-        "/api/predict",
-        json={"job_text": "We are hiring a Python developer for our office."},
-    )
-    dashboard_response = client.get("/dashboard")
+    home_response = client.get("/", follow_redirects=False)
+    predict_response = client.get("/predict", follow_redirects=False)
+    api_response = client.post("/api/predict", json={"job_text": "test"}, follow_redirects=False)
 
-    assert index_response.status_code == 200
-    assert b"Fraudulent" in index_response.data
-    assert b"DummyRouteModel" in index_response.data
-    assert api_response.status_code == 200
-    assert api_response.get_json()["label"] == "Legitimate"
+    assert home_response.status_code == 302
+    assert "/signin" in home_response.headers["Location"]
+    assert predict_response.status_code == 302
+    assert "/signin" in predict_response.headers["Location"]
+    assert api_response.status_code == 302
+
+
+def test_user_signup_signin_and_prediction_flow(app_module):
+    flask_app = app_module.create_app({"ADMIN_SIGNUP_CODE": "secret-admin"})
+    client = flask_app.test_client()
+
+    create_user_account(client, "/signup")
+    overview_response = client.get("/overview", follow_redirects=True)
+    signals_response = client.get("/signals", follow_redirects=True)
+    prediction_response = client.post(
+        "/predict",
+        data={"job_text": "Urgent work from home role. Payment required to start."},
+        follow_redirects=True,
+    )
+    dashboard_response = client.get("/dashboard", follow_redirects=True)
+
+    assert overview_response.status_code == 200
+    assert b"How It Works" in overview_response.data
+    assert signals_response.status_code == 200
+    assert b"Common Detection Signals" in signals_response.data
+    assert prediction_response.status_code == 200
+    assert b"Fraudulent" in prediction_response.data
+    assert b"DummyRouteModel" in prediction_response.data
     assert dashboard_response.status_code == 200
-    assert b"Prediction Distribution" in dashboard_response.data
+    assert b"Admin access is required for this page." in dashboard_response.data
+
+
+def test_admin_signup_signin_and_dashboard_access(app_module):
+    flask_app = app_module.create_app({"ADMIN_SIGNUP_CODE": "secret-admin"})
+    client = flask_app.test_client()
+
+    response = client.post(
+        "/admin/signup",
+        data={
+            "full_name": "System Admin",
+            "email": "admin@example.com",
+            "password": "adminpass123",
+            "admin_code": "secret-admin",
+        },
+        follow_redirects=True,
+    )
+    dashboard_response = client.get("/dashboard", follow_redirects=True)
+
+    assert response.status_code == 200
+    assert b"Recent Predictions" in response.data
+    assert dashboard_response.status_code == 200
     assert b"Recent Predictions" in dashboard_response.data

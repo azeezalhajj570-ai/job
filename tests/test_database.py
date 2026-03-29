@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from src.database import (
+    create_user,
     get_dashboard_metrics,
     get_label_counts,
     get_recent_predictions,
+    get_user_by_email,
     initialize_database,
     insert_prediction,
 )
@@ -34,3 +36,22 @@ def test_database_metrics_and_recent_predictions(tmp_path) -> None:
     assert recent[0]["predicted_label"] == "Fraudulent"
     assert recent[0]["job_text"] == "fake job three"
     assert recent[0]["model_name"] == "Model A"
+
+
+def test_user_creation_and_lookup(tmp_path) -> None:
+    db_path = tmp_path / "predictions.db"
+    initialize_database(str(db_path))
+
+    user_id = create_user(
+        str(db_path),
+        full_name="Test User",
+        email="student@example.com",
+        password_hash="hashed-password",
+        role="user",
+    )
+    user = get_user_by_email(str(db_path), "student@example.com")
+
+    assert user_id > 0
+    assert user is not None
+    assert user["full_name"] == "Test User"
+    assert user["role"] == "user"

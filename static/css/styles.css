@@ -7,20 +7,16 @@ button,
 input,
 select,
 textarea {
-    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-family: "Nunito", sans-serif;
 }
 
-body {
-    background-image:
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.94)),
-        radial-gradient(circle at top right, rgba(31, 122, 115, 0.1), transparent 34%),
-        radial-gradient(circle at left 70%, rgba(141, 94, 47, 0.08), transparent 28%),
-        linear-gradient(135deg, rgba(244, 241, 235, 0.8), rgba(255, 255, 255, 0.92));
-    color: #10211f;
+textarea:focus,
+input:focus {
+    outline: none;
 }
 
-textarea::placeholder {
-    color: #94a3b8;
+.conf-fill {
+    transition: width 0.5s ease;
 }
 
 canvas {
@@ -28,36 +24,8 @@ canvas {
 }
 
 ::selection {
-    background: rgba(31, 122, 115, 0.18);
-    color: #10211f;
-}
-
-.glass {
-    background: rgba(255, 255, 255, 0.78);
-    backdrop-filter: blur(18px);
-}
-
-.section-kicker {
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: #1f7a73;
-}
-
-.fade-in {
-    animation: fade-in 0.5s ease-out both;
-}
-
-@keyframes fade-in {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    background: rgba(37, 99, 235, 0.18);
+    color: #1f2937;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -65,7 +33,7 @@ canvas {
         scroll-behavior: auto;
     }
 
-    .fade-in {
-        animation: none;
+    .conf-fill {
+        transition: none;
     }
 }
