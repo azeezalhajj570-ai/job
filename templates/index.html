@@ -3,78 +3,142 @@
 {% block title %}Predict Fraud | Recruitment Fraud Detection{% endblock %}
 
 {% block content %}
-<section class="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+<section class="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
     <div class="space-y-6">
-        <div class="rounded-[2rem] border border-white/70 bg-white/90 p-8 shadow-glow">
-            <div class="mb-6 flex flex-wrap items-center gap-3">
-                <span class="rounded-full bg-brand-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-brand-700">NLP + ML Pipeline</span>
-                {% if model_ready %}
-                    <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">Model Ready</span>
-                {% else %}
-                    <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">Training Required</span>
-                {% endif %}
+        <div class="overflow-hidden rounded-[2rem] border border-white/80 bg-white/92 shadow-glow">
+            <div class="grid gap-8 p-8 xl:grid-cols-[1.05fr_0.95fr] xl:p-10">
+                <div class="space-y-6">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="rounded-full bg-brand-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-brand-700">NLP + ML Pipeline</span>
+                        {% if model_ready %}
+                            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">Model Ready</span>
+                        {% else %}
+                            <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">Training Required</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="space-y-4">
+                        <p class="text-sm font-semibold uppercase tracking-[0.28em] text-slate-500">Academic Demo</p>
+                        <h2 class="max-w-2xl font-serif text-4xl leading-tight text-ink md:text-5xl">
+                            Detect recruitment fraud with a reproducible text classification workflow.
+                        </h2>
+                        <p class="max-w-2xl text-base leading-7 text-slate-600">
+                            Paste a job description to classify whether the posting appears fraudulent or legitimate. The system applies text normalization, TF-IDF features, and a supervised model to generate a prediction and confidence score.
+                        </p>
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-3">
+                        <div class="rounded-3xl bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Detection focus</p>
+                            <p class="mt-2 text-sm font-medium text-ink">Fake offers, payment scams, identity theft cues</p>
+                        </div>
+                        <div class="rounded-3xl bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Features</p>
+                            <p class="mt-2 text-sm font-medium text-ink">Cleaning, TF-IDF, classification, dashboard logging</p>
+                        </div>
+                        <div class="rounded-3xl bg-slate-50 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Output</p>
+                            <p class="mt-2 text-sm font-medium text-ink">Label, confidence, and best model used</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-[1.75rem] border border-slate-200/80 bg-[linear-gradient(180deg,rgba(16,33,31,0.03),rgba(255,255,255,0.92))] p-5">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">Try a sample</h3>
+                        <span class="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">One click</span>
+                    </div>
+                    <div class="mt-4 space-y-3" data-sample-triggers>
+                        <button type="button" class="sample-job w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left text-sm text-slate-700 transition hover:border-brand-300 hover:bg-brand-50" data-sample="Immediate hiring. Work from home and earn 5000 dollars weekly. No interview required. Send your bank details to get started today.">
+                            Fraud-style sample with urgency and payment request
+                        </button>
+                        <button type="button" class="sample-job w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left text-sm text-slate-700 transition hover:border-brand-300 hover:bg-brand-50" data-sample="We are seeking a Python developer with experience in Flask, SQL, and REST APIs for a full-time onsite role in Riyadh.">
+                            Legitimate-style sample with role details
+                        </button>
+                        <button type="button" class="sample-job w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left text-sm text-slate-700 transition hover:border-brand-300 hover:bg-brand-50" data-sample="Limited spots available. Pay registration fees now to secure your employment package and visa support.">
+                            Fraud-style sample with upfront fee language
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-card">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-[0.25em] text-brand-600">Prediction Console</p>
+                    <h3 class="mt-2 text-2xl font-semibold text-ink">Analyze a job posting</h3>
+                </div>
+                <p class="text-sm text-slate-500">Desktop and mobile friendly</p>
             </div>
 
-            <h2 class="max-w-2xl text-4xl font-semibold tracking-tight text-slate-950">Analyze job postings for recruitment fraud in seconds.</h2>
-            <p class="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-                Paste a job description to classify whether the posting appears fraudulent or legitimate. The system applies text normalization, TF-IDF features, and a trained machine learning classifier to generate a confidence score.
-            </p>
-
-            <form id="prediction-form" method="POST" class="mt-8 space-y-5">
+            <form id="prediction-form" method="POST" class="mt-6 space-y-5">
                 <label for="job_text" class="block text-sm font-semibold text-slate-800">Job Description</label>
                 <textarea
                     id="job_text"
                     name="job_text"
-                    rows="12"
+                    rows="14"
                     placeholder="Paste the full job advertisement here..."
-                    class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm leading-6 text-slate-800 shadow-inner outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100"
+                    class="w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 px-5 py-4 text-sm leading-7 text-slate-800 shadow-inner outline-none transition focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-100"
                 >{{ submitted_text }}</textarea>
 
                 <div class="flex flex-wrap items-center gap-4">
                     <button
                         id="submit-button"
                         type="submit"
-                        class="inline-flex items-center justify-center rounded-2xl bg-brand-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100"
+                        class="inline-flex items-center justify-center rounded-2xl bg-ink px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 transition hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-200"
                     >
                         <span class="button-label">Analyze Posting</span>
                         <span class="loading-label hidden">Analyzing...</span>
                     </button>
-                    <p class="text-sm text-slate-500">Best model and confidence will be shown after prediction.</p>
+                    <p class="max-w-xl text-sm leading-6 text-slate-500">The model will classify the text, then store the prediction for dashboard analytics.</p>
                 </div>
             </form>
         </div>
     </div>
 
     <aside class="space-y-6">
-        <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 class="text-lg font-semibold text-slate-900">Detection Signals</h3>
+        <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-card">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-ink">Detection Signals</h3>
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">Guidance</span>
+            </div>
             <div class="mt-5 space-y-4">
                 <div class="rounded-2xl bg-slate-50 p-4">
-                    <p class="text-sm font-medium text-slate-800">Fraud indicators</p>
-                    <p class="mt-2 text-sm text-slate-600">Suspicious urgency, unrealistic income claims, limited company identity, or requests for upfront payment.</p>
+                    <p class="text-sm font-medium text-ink">Fraud indicators</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">Suspicious urgency, unrealistic income claims, limited company identity, or requests for upfront payment.</p>
                 </div>
                 <div class="rounded-2xl bg-slate-50 p-4">
-                    <p class="text-sm font-medium text-slate-800">Legitimate indicators</p>
-                    <p class="mt-2 text-sm text-slate-600">Clear responsibilities, traceable company details, realistic requirements, and professional hiring process language.</p>
+                    <p class="text-sm font-medium text-ink">Legitimate indicators</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">Clear responsibilities, traceable company details, realistic requirements, and professional hiring language.</p>
                 </div>
             </div>
         </div>
 
-        <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 class="text-lg font-semibold text-slate-900">Prediction Result</h3>
+        <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-card">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-ink">Prediction Result</h3>
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">Live output</span>
+            </div>
             {% if prediction %}
-                <div class="mt-5 rounded-3xl {% if prediction.label == 'Fraudulent' %}border border-red-200 bg-red-50{% else %}border border-emerald-200 bg-emerald-50{% endif %} p-5">
+                <div class="mt-5 rounded-[1.75rem] {% if prediction.label == 'Fraudulent' %}border border-red-200 bg-red-50{% else %}border border-emerald-200 bg-emerald-50{% endif %} p-5">
                     <div class="flex items-center justify-between gap-4">
                         <span class="text-sm font-semibold uppercase tracking-[0.2em] {% if prediction.label == 'Fraudulent' %}text-red-600{% else %}text-emerald-600{% endif %}">
                             {{ prediction.label }}
                         </span>
-                        <span class="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700">{{ prediction.model_name }}</span>
+                        <span class="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm">{{ prediction.model_name }}</span>
                     </div>
-                    <p class="mt-4 text-3xl font-semibold text-slate-950">{{ prediction.confidence }}%</p>
+                    <p class="mt-4 text-4xl font-semibold text-ink">{{ prediction.confidence }}%</p>
                     <p class="mt-1 text-sm text-slate-600">Confidence score for the predicted class.</p>
+                    {% if prediction.cleaned_text %}
+                        <div class="mt-5 rounded-2xl bg-white/70 p-4">
+                            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Cleaned text preview</p>
+                            <p class="mt-2 text-sm leading-6 text-slate-700">{{ prediction.cleaned_text[:220] }}{% if prediction.cleaned_text|length > 220 %}...{% endif %}</p>
+                        </div>
+                    {% endif %}
                 </div>
             {% else %}
-                <div class="mt-5 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-5 text-sm text-slate-500">
+                <div class="mt-5 rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 p-5 text-sm leading-6 text-slate-500">
                     Submit a job description to see the classification result, confidence score, and model used for prediction.
                 </div>
             {% endif %}
