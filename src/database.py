@@ -18,22 +18,42 @@ def initialize_database(database_path: str) -> None:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 job_text TEXT NOT NULL,
                 predicted_label TEXT NOT NULL,
+                model_name TEXT NOT NULL DEFAULT 'Unknown',
                 confidence REAL NOT NULL,
+                input_length INTEGER NOT NULL DEFAULT 0,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
             """
         )
+        existing_columns = {
+            row["name"]
+            for row in connection.execute("PRAGMA table_info(predictions)").fetchall()
+        }
+        if "model_name" not in existing_columns:
+            connection.execute(
+                "ALTER TABLE predictions ADD COLUMN model_name TEXT NOT NULL DEFAULT 'Unknown'"
+            )
+        if "input_length" not in existing_columns:
+            connection.execute(
+                "ALTER TABLE predictions ADD COLUMN input_length INTEGER NOT NULL DEFAULT 0"
+            )
         connection.commit()
 
 
-def insert_prediction(database_path: str, job_text: str, predicted_label: str, confidence: float) -> None:
+def insert_prediction(
+    database_path: str,
+    job_text: str,
+    predicted_label: str,
+    confidence: float,
+    model_name: str,
+) -> None:
     with get_connection(database_path) as connection:
         connection.execute(
             """
-            INSERT INTO predictions (job_text, predicted_label, confidence)
-            VALUES (?, ?, ?)
+            INSERT INTO predictions (job_text, predicted_label, model_name, confidence, input_length)
+            VALUES (?, ?, ?, ?, ?)
             """,
-            (job_text, predicted_label, confidence),
+            (job_text, predicted_label, model_name, confidence, len(job_text)),
         )
         connection.commit()
 
@@ -45,7 +65,9 @@ def get_dashboard_metrics(database_path: str) -> dict[str, Any]:
             SELECT
                 COUNT(*) AS total_jobs,
                 SUM(CASE WHEN predicted_label = 'Fraudulent' THEN 1 ELSE 0 END) AS fraud_count,
-                SUM(CASE WHEN predicted_label = 'Legitimate' THEN 1 ELSE 0 END) AS legitimate_count
+                SUM(CASE WHEN predicted_label = 'Legitimate' THEN 1 ELSE 0 END) AS legitimate_count,
+                AVG(confidence) AS avg_confidence,
+                AVG(input_length) AS avg_input_length
             FROM predictions
             """
         ).fetchone()
@@ -53,6 +75,8 @@ def get_dashboard_metrics(database_path: str) -> dict[str, Any]:
     total_jobs = int(row["total_jobs"] or 0)
     fraud_count = int(row["fraud_count"] or 0)
     legitimate_count = int(row["legitimate_count"] or 0)
+    avg_confidence = round(float(row["avg_confidence"] or 0.0), 2)
+    avg_input_length = round(float(row["avg_input_length"] or 0.0), 1)
     fraud_rate = round((fraud_count / total_jobs) * 100, 2) if total_jobs else 0.0
 
     return {
@@ -60,6 +84,8 @@ def get_dashboard_metrics(database_path: str) -> dict[str, Any]:
         "fraud_count": fraud_count,
         "legitimate_count": legitimate_count,
         "fraud_rate": fraud_rate,
+        "avg_confidence": avg_confidence,
+        "avg_input_length": avg_input_length,
     }
 
 
@@ -67,7 +93,7 @@ def get_recent_predictions(database_path: str, limit: int = 10) -> list[dict[str
     with get_connection(database_path) as connection:
         rows = connection.execute(
             """
-            SELECT id, job_text, predicted_label, confidence, created_at
+            SELECT id, job_text, predicted_label, model_name, confidence, input_length, created_at
             FROM predictions
             ORDER BY id DESC
             LIMIT ?
@@ -91,3 +117,17 @@ def get_label_counts(database_path: str) -> dict[str, int]:
     for row in rows:
         counts[row["predicted_label"]] = int(row["count"])
     return counts
+
+
+def get_model_usage(database_path: str) -> list[dict[str, Any]]:
+    with get_connection(database_path) as connection:
+        rows = connection.execute(
+            """
+            SELECT model_name, COUNT(*) AS count
+            FROM predictions
+            GROUP BY model_name
+            ORDER BY count DESC, model_name ASC
+            """
+        ).fetchall()
+
+    return [dict(row) for row in rows]

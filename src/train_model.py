@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import joblib
@@ -10,7 +11,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, precision_score, recall_score
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold, cross_val_score, train_test_split
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import SVC
 
@@ -45,11 +46,15 @@ def build_models() -> dict[str, object]:
 def evaluate_model(model: object, x_train, x_test, y_train, y_test) -> dict:
     model.fit(x_train, y_train)
     predictions = model.predict(x_test)
+    cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=RANDOM_STATE)
+    cv_scores = cross_val_score(model, x_train, y_train, cv=cv, scoring="f1")
     return {
         "accuracy": round(float(accuracy_score(y_test, predictions)), 4),
         "precision": round(float(precision_score(y_test, predictions, zero_division=0)), 4),
         "recall": round(float(recall_score(y_test, predictions, zero_division=0)), 4),
         "f1_score": round(float(f1_score(y_test, predictions, zero_division=0)), 4),
+        "cv_f1_mean": round(float(np.mean(cv_scores)), 4),
+        "cv_f1_std": round(float(np.std(cv_scores)), 4),
         "confusion_matrix": confusion_matrix(y_test, predictions).tolist(),
     }
 
@@ -80,7 +85,14 @@ def train_and_select_model(dataset: DatasetBundle, model_dir: Path) -> dict:
         )
         trained_models[model_name] = model
 
-    best_model_name = max(metrics_by_model, key=lambda name: metrics_by_model[name]["f1_score"])
+    best_model_name = max(
+        metrics_by_model,
+        key=lambda name: (
+            metrics_by_model[name]["f1_score"],
+            metrics_by_model[name]["cv_f1_mean"],
+            metrics_by_model[name]["accuracy"],
+        ),
+    )
     best_model = trained_models[best_model_name]
 
     model_dir.mkdir(parents=True, exist_ok=True)
@@ -94,6 +106,8 @@ def train_and_select_model(dataset: DatasetBundle, model_dir: Path) -> dict:
         "target_column": dataset.target_column,
         "train_size": int(len(x_train)),
         "test_size": int(len(x_test)),
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "feature_count": int(len(vectorizer.get_feature_names_out())),
         "class_distribution": {
             "legitimate": int(np.sum(dataset.labels == 0)),
             "fraudulent": int(np.sum(dataset.labels == 1)),

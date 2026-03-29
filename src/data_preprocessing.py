@@ -8,6 +8,54 @@ from typing import Iterable
 import pandas as pd
 
 
+STOP_WORDS = {
+    "a",
+    "an",
+    "and",
+    "are",
+    "as",
+    "at",
+    "be",
+    "by",
+    "for",
+    "from",
+    "has",
+    "he",
+    "in",
+    "is",
+    "it",
+    "its",
+    "of",
+    "on",
+    "that",
+    "the",
+    "to",
+    "was",
+    "were",
+    "will",
+    "with",
+    "you",
+    "your",
+    "we",
+    "our",
+    "this",
+    "these",
+    "those",
+    "or",
+    "but",
+    "if",
+    "into",
+    "than",
+    "then",
+    "there",
+    "their",
+    "they",
+    "them",
+    "job",
+    "role",
+    "position",
+}
+
 TEXT_COLUMN_CANDIDATES = [
     "description",
     "job_description",
@@ -34,7 +82,7 @@ class DatasetBundle:
 
 
 def clean_text(text: str) -> str:
-    """Lowercase, remove punctuation/numbers, and normalize whitespace."""
+    """Lowercase, remove punctuation/numbers/stop words, and normalize whitespace."""
     if not isinstance(text, str):
         text = "" if text is None else str(text)
 
@@ -42,7 +90,8 @@ def clean_text(text: str) -> str:
     text = text.translate(str.maketrans("", "", string.punctuation))
     text = re.sub(r"\d+", " ", text)
     text = re.sub(r"\s+", " ", text).strip()
-    return text
+    tokens = [token for token in text.split() if token not in STOP_WORDS]
+    return " ".join(tokens)
 
 
 def normalize_labels(labels: Iterable) -> pd.Series:
@@ -71,6 +120,28 @@ def detect_column(columns: Iterable[str], candidates: list[str], column_kind: st
     )
 
 
+def build_text_series(dataframe: pd.DataFrame, primary_text_column: str) -> pd.Series:
+    optional_context_columns = [
+        "title",
+        "job_title",
+        "company",
+        "company_name",
+        "department",
+        "location",
+        "requirements",
+        "benefits",
+    ]
+
+    available_columns = [primary_text_column]
+    lowered_map = {column.lower(): column for column in dataframe.columns}
+    for candidate in optional_context_columns:
+        if candidate in lowered_map:
+            available_columns.append(lowered_map[candidate])
+
+    combined = dataframe[available_columns].fillna("").astype(str).agg(" ".join, axis=1)
+    return combined.map(clean_text)
+
+
 def load_training_data(csv_path: str) -> DatasetBundle:
     dataframe = pd.read_csv(csv_path)
     if dataframe.empty:
@@ -83,7 +154,7 @@ def load_training_data(csv_path: str) -> DatasetBundle:
     if working_df.empty:
         raise ValueError("No usable rows remained after dropping missing values.")
 
-    working_df[text_column] = working_df[text_column].astype(str).map(clean_text)
+    working_df[text_column] = build_text_series(dataframe.loc[working_df.index], text_column)
     working_df[target_column] = normalize_labels(working_df[target_column])
 
     return DatasetBundle(
