@@ -70,7 +70,7 @@ def admin_required(view: Callable) -> Callable:
     def wrapped_view(*args, **kwargs):
         if g.current_user is None:
             flash("Please sign in as admin first.", "error")
-            return redirect(url_for("admin_signin"))
+            return redirect(url_for("user_signin"))
         if g.current_user["role"] != "admin":
             flash("Admin access is required for this page.", "error")
             return redirect(url_for("index"))
@@ -160,16 +160,16 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
             title=f"{role.title()} Sign Up",
         )
 
-    def handle_signin(role: str) -> str:
-        if g.current_user is not None and g.current_user["role"] == role:
-            return redirect(url_for("dashboard" if role == "admin" else "overview"))
+    def handle_signin(role: str | None = None) -> str:
+        if g.current_user is not None:
+            return redirect(url_for("dashboard" if g.current_user["role"] == "admin" else "overview"))
 
         if request.method == "POST":
             email = (request.form.get("email") or "").strip().lower()
             password = request.form.get("password") or ""
             user = get_user_by_email(app.config["DATABASE_PATH"], email)
 
-            if user is None or user["role"] != role or not check_password_hash(
+            if user is None or (role is not None and user["role"] != role) or not check_password_hash(
                 user["password_hash"], password
             ):
                 flash("Invalid credentials.", "error")
@@ -177,13 +177,13 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
                 session.clear()
                 session["user_id"] = user["id"]
                 flash("Signed in successfully.", "success")
-                return redirect(url_for("dashboard" if role == "admin" else "overview"))
+                return redirect(url_for("dashboard" if user["role"] == "admin" else "overview"))
 
         return render_template(
             "auth.html",
             page_mode="signin",
-            role=role,
-            title=f"{role.title()} Sign In",
+            role=role or "user",
+            title="Sign In",
         )
 
     @app.route("/")
@@ -280,7 +280,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
 
     @app.route("/signin", methods=["GET", "POST"])
     def user_signin() -> str:
-        return handle_signin("user")
+        return handle_signin()
 
     @app.route("/admin/signup", methods=["GET", "POST"])
     def admin_signup() -> str:
@@ -288,7 +288,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
 
     @app.route("/admin/signin", methods=["GET", "POST"])
     def admin_signin() -> str:
-        return handle_signin("admin")
+        return redirect(url_for("user_signin"))
 
     @app.route("/logout")
     def logout() -> str:

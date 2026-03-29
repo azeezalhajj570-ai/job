@@ -301,13 +301,14 @@ def add_chapter_1(document: Document, metrics: dict, metadata: dict) -> None:
     add_heading(document, "1.3 Problem Statement", 2)
     add_paragraph(document, "The rapid increase in online job postings makes manual inspection inefficient. Fraudulent recruitment posts can appear highly convincing, which creates a need for an automated system that can analyze textual content and classify suspicious advertisements using machine learning.")
     add_heading(document, "1.4 Scope", 2)
-    add_paragraph(document, "This project focuses on English-language text classification for job advertisements. The implemented system covers dataset preprocessing, feature extraction with TF-IDF, machine learning model comparison, a Flask-based web application, authentication for users and administrators, and a dashboard for prediction monitoring.")
+    add_paragraph(document, "This project focuses on English-language text classification for job advertisements. The implemented system covers dataset preprocessing, feature extraction with TF-IDF, machine learning model comparison, a Flask-based web application, shared sign-in with role-based access control, multi-page responsive interfaces, and an administrative dashboard for prediction monitoring.")
     add_heading(document, "1.5 Objectives", 2)
     add_bullets(document, [
         "Develop a machine learning system that classifies job posts as legitimate or fraudulent.",
         "Compare multiple algorithms and select the best one using evaluation metrics.",
-        "Provide a user-facing web interface for text submission and prediction.",
-        "Provide an administrator dashboard for monitoring prediction activity.",
+        "Provide a user-facing web interface with separate overview, prediction, and signals pages.",
+        "Provide an administrator dashboard for monitoring prediction activity and stored results.",
+        "Provide responsive navigation that adapts from desktop top navigation to a mobile sidebar menu.",
         "Document the system thoroughly for graduation-level evaluation.",
     ])
     add_heading(document, "1.6 Advantages", 2)
@@ -332,7 +333,7 @@ def add_chapter_1(document: Document, metrics: dict, metadata: dict) -> None:
             ["Web Framework", "Flask"],
             ["Machine Learning", "scikit-learn, joblib"],
             ["Data Processing", "pandas, NumPy"],
-            ["Frontend", "HTML, Tailwind CSS, JavaScript, Chart.js"],
+            ["Frontend", "HTML, Tailwind CSS, JavaScript, Chart.js, responsive mobile sidebar UI"],
             ["Database", "SQLite"],
             ["Documentation", "DOCX report generated for graduation submission"],
         ],
@@ -358,7 +359,7 @@ def add_chapter_1(document: Document, metrics: dict, metadata: dict) -> None:
             ["Phase 1", "Problem analysis and proposal writing", "Defined scope, objectives, risks"],
             ["Phase 2", "Dataset preparation and preprocessing", "Clean labeled job posting data"],
             ["Phase 3", "Model development and evaluation", "Best-performing ML model"],
-            ["Phase 4", "Web application implementation", "Prediction page and admin dashboard"],
+            ["Phase 4", "Web application implementation", "Authentication, multi-page UI, prediction page, and admin dashboard"],
             ["Phase 5", "Testing and documentation", "Validated system and graduation report"],
         ],
     )
@@ -403,22 +404,26 @@ def add_chapter_3(document: Document) -> None:
     )
     add_heading(document, "3.3 REQUIREMENTS ELICITATION", 2)
     add_bullets(document, [
-        "The system shall allow users to sign up and sign in.",
-        "The system shall allow administrators to sign up and sign in.",
+        "The system shall allow users and administrators to authenticate through a shared sign-in page.",
+        "The system shall allow separate user sign-up and admin sign-up flows.",
         "The system shall accept job description text as input.",
         "The system shall classify the input as legitimate or fraudulent.",
         "The system shall save prediction records to the database.",
-        "The system shall display dashboard statistics to administrators.",
+        "The system shall display overview, prediction, and signals pages to authenticated users.",
+        "The system shall display dashboard statistics to administrators only.",
+        "The system shall adapt navigation for desktop and mobile devices.",
     ])
     add_heading(document, "3.4 REQUIREMENTS SPECIFICATION", 2)
     add_table(
         document,
         ["Requirement Type", "Requirement"],
         [
-            ["Functional", "User authentication for regular users and admins"],
+            ["Functional", "Shared sign-in with role-based redirect for users and admins"],
+            ["Functional", "Separate user sign-up and admin sign-up with admin code"],
             ["Functional", "Job text prediction using a trained ML model"],
             ["Functional", "Prediction logging and dashboard visualization"],
-            ["Non-functional", "Usable web interface for project demonstration"],
+            ["Functional", "Separate overview, predict, signals, and dashboard pages"],
+            ["Non-functional", "Responsive Tailwind CSS interface for mobile and desktop"],
             ["Non-functional", "Modular code structure and automated tests"],
             ["Non-functional", "Reasonable response time for single text predictions"],
         ],
@@ -462,9 +467,12 @@ def add_chapter_5(document: Document) -> None:
         document,
         ["Interface", "Purpose", "Main Elements"],
         [
-            ["User sign in / sign up", "Authentication for standard users", "Name, email, password"],
-            ["Admin sign in / sign up", "Authentication for admins", "Name, email, password, admin code"],
+            ["Shared sign-in page", "Authenticate both users and admins", "Email, password, role-based redirect"],
+            ["User sign-up page", "Create standard user accounts", "Name, email, password"],
+            ["Admin sign-up page", "Create admin accounts", "Name, email, password, admin code"],
+            ["Overview page", "Summarize system purpose and quick metrics", "Stat cards, process summary, navigation"],
             ["Prediction page", "Submit job text and view prediction", "Textarea, sample inputs, result card"],
+            ["Signals page", "Explain fraud and legitimate indicators", "Reference cards and guidance text"],
             ["Dashboard", "Monitor stored outputs", "Metric cards, chart, recent predictions table"],
         ],
     )
@@ -515,7 +523,7 @@ def build_document() -> Path:
     add_cover_page(document)
 
     add_heading(document, "ABSTRACT", 1)
-    add_paragraph(document, "This project presents a machine learning based recruitment fraud detection system for online job portals. The system preprocesses job advertisement text, transforms it using TF-IDF, and evaluates multiple classification models including Logistic Regression, Naive Bayes, Support Vector Machine, and Random Forest. The selected model is integrated into a Flask web application that supports authenticated users, administrative monitoring, and prediction logging. The system aims to reduce the risk of online recruitment scams and improve trust in digital hiring environments.")
+    add_paragraph(document, "This project presents a machine learning based recruitment fraud detection system for online job portals. The system preprocesses job advertisement text, transforms it using TF-IDF, and evaluates multiple classification models including Logistic Regression, Naive Bayes, Support Vector Machine, and Random Forest. The selected model is integrated into a Flask web application that supports shared authentication, role-based access, responsive multi-page navigation, administrative monitoring, and prediction logging. The system aims to reduce the risk of online recruitment scams and improve trust in digital hiring environments.")
     document.add_paragraph("")
 
     add_heading(document, "ACKNOWLEDGMENT", 1)

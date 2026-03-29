@@ -1,4 +1,45 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const mobileMenuButton = document.getElementById("mobile-menu-button");
+    const mobileCloseButton = document.getElementById("mobile-close-button");
+    const mobileSidebar = document.getElementById("mobile-sidebar");
+    const mobileOverlay = document.getElementById("mobile-overlay");
+
+    if (mobileMenuButton && mobileCloseButton && mobileSidebar && mobileOverlay) {
+        const openMobileMenu = () => {
+            mobileSidebar.classList.remove("-translate-x-full", "pointer-events-none");
+            mobileOverlay.classList.remove("pointer-events-none", "opacity-0");
+            mobileMenuButton.setAttribute("aria-expanded", "true");
+            document.body.classList.add("overflow-hidden");
+        };
+
+        const closeMobileMenu = () => {
+            mobileSidebar.classList.add("-translate-x-full", "pointer-events-none");
+            mobileOverlay.classList.add("pointer-events-none", "opacity-0");
+            mobileMenuButton.setAttribute("aria-expanded", "false");
+            document.body.classList.remove("overflow-hidden");
+        };
+
+        mobileMenuButton.addEventListener("click", openMobileMenu);
+        mobileCloseButton.addEventListener("click", closeMobileMenu);
+        mobileOverlay.addEventListener("click", closeMobileMenu);
+
+        mobileSidebar.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", closeMobileMenu);
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                closeMobileMenu();
+            }
+        });
+
+        window.addEventListener("resize", () => {
+            if (window.innerWidth >= 768) {
+                closeMobileMenu();
+            }
+        });
+    }
+
     const form = document.getElementById("prediction-form");
     const submitButton = document.getElementById("submit-button");
     const textarea = document.getElementById("job_text");
