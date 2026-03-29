@@ -50,16 +50,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 labels: ["Fraudulent", "Legitimate"],
                 datasets: [{
                     data: [fraudCount, legitimateCount],
-                    backgroundColor: ["#b5473c", "#1c8b58"],
-                    hoverBackgroundColor: ["#d86a5d", "#35a46f"],
+                    backgroundColor: ["#c84b47", "#1f8f5f"],
+                    hoverBackgroundColor: ["#db6b67", "#33a974"],
                     borderWidth: 0,
-                    hoverOffset: 8
+                    hoverOffset: 6
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: "68%",
+                cutout: "62%",
                 plugins: {
                     tooltip: {
                         callbacks: {
@@ -72,17 +72,17 @@ document.addEventListener("DOMContentLoaded", () => {
                         position: "bottom",
                         labels: {
                             usePointStyle: true,
-                            padding: 18,
+                            padding: 16,
                             color: "#334155",
                             font: {
-                                family: "IBM Plex Sans",
+                                family: "Poppins",
                                 size: 12
                             }
                         }
                     }
                 },
                 animation: {
-                    duration: 900
+                    duration: 500
                 }
             }
         });

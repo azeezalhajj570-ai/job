@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Recruitment Fraud Detection{% endblock %}</title>
-    <meta name="description" content="Academic demo for recruitment fraud detection using NLP, machine learning, and a Flask dashboard.">
+    <meta name="description" content="Analyze job postings and detect potentially fraudulent recruitment content.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -15,25 +15,22 @@
                 extend: {
                     colors: {
                         brand: {
-                            50: "#eef7f7",
-                            100: "#d7f0ed",
-                            500: "#1f7a73",
-                            600: "#13635e",
-                            700: "#0e4b47"
+                            50: "#eef4ff",
+                            100: "#dbe8ff",
+                            500: "#3159d6",
+                            600: "#294ab0",
+                            700: "#213c8d"
                         },
-                        canvas: "#f4f1eb",
-                        ink: "#10211f",
-                        success: "#1c8b58",
-                        danger: "#b5473c",
-                        accent: "#8d5e2f"
+                        canvas: "#f6f7fb",
+                        ink: "#182033",
+                        success: "#1f8f5f",
+                        danger: "#c84b47"
                     },
                     boxShadow: {
-                        glow: "0 24px 60px rgba(16, 33, 31, 0.14)",
-                        card: "0 14px 40px rgba(16, 33, 31, 0.08)"
+                        soft: "0 10px 28px rgba(24, 32, 51, 0.08)"
                     },
                     fontFamily: {
-                        sans: ["IBM Plex Sans", "ui-sans-serif", "system-ui", "sans-serif"],
-                        serif: ["Merriweather", "Georgia", "serif"]
+                        sans: ["Poppins", "ui-sans-serif", "system-ui", "sans-serif"]
                     }
                 }
             }
@@ -43,34 +40,38 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body class="min-h-screen bg-canvas text-slate-900 antialiased">
-    <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div class="absolute left-[-8rem] top-[-6rem] h-80 w-80 rounded-full bg-[radial-gradient(circle,rgba(31,122,115,0.22),transparent_68%)] blur-2xl"></div>
-        <div class="absolute right-[-7rem] top-[6rem] h-96 w-96 rounded-full bg-[radial-gradient(circle,rgba(141,94,47,0.16),transparent_70%)] blur-2xl"></div>
-        <div class="absolute inset-x-0 top-0 h-64 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,255,255,0))]"></div>
-    </div>
+    <div class="pointer-events-none fixed inset-x-0 top-0 -z-10 h-64 bg-[linear-gradient(180deg,rgba(49,89,214,0.12),rgba(246,247,251,0))]"></div>
 
-    <nav class="border-b border-slate-200/70 bg-white/72 backdrop-blur-xl">
-        <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-            <a href="{{ url_for('index') }}" class="flex items-center gap-3">
-                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-600 text-lg font-bold text-white shadow-glow">RF</div>
+    <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 lg:px-8">
+            <a href="{% if current_user %}{{ url_for('index') }}{% else %}{{ url_for('user_signin') }}{% endif %}" class="flex items-center gap-3">
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-600 text-sm font-bold text-white">RF</div>
                 <div>
-                    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">ML Security Lab</p>
-                    <h1 class="text-lg font-semibold text-ink">Recruitment Fraud Detection</h1>
+                    <p class="text-base font-semibold text-ink">Recruitment Fraud Detection</p>
+                    <p class="text-xs text-slate-500">Smart screening for online job postings</p>
                 </div>
             </a>
-            <div class="flex items-center gap-3">
-                <a href="{{ url_for('index') }}" class="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-ink">Predict</a>
-                <a href="{{ url_for('dashboard') }}" class="rounded-full bg-ink px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800">Dashboard</a>
-            </div>
-        </div>
-    </nav>
 
-    <main class="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+            <nav class="hidden items-center gap-2 md:flex">
+                {% if current_user %}
+                    <a href="{{ url_for('index') }}" class="rounded-md px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-ink">Predict</a>
+                    <a href="{{ url_for('dashboard') }}" class="rounded-md px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-ink">Dashboard</a>
+                    <span class="rounded-md bg-slate-100 px-3 py-2 text-sm text-slate-600">{{ current_user.full_name }}</span>
+                    <a href="{{ url_for('logout') }}" class="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-700">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('user_signin') }}" class="rounded-md px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-ink">Sign In</a>
+                    <a href="{{ url_for('user_signup') }}" class="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-700">Sign Up</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="mx-auto min-h-[calc(100vh-180px)] max-w-6xl px-5 py-8 lg:px-8">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <div class="mb-6 space-y-3">
                     {% for category, message in messages %}
-                        <div class="rounded-2xl border px-4 py-3 text-sm shadow-sm {% if category == 'error' %}border-red-200 bg-red-50 text-red-700{% else %}border-emerald-200 bg-emerald-50 text-emerald-700{% endif %}">
+                        <div class="rounded-lg border px-4 py-3 text-sm {% if category == 'error' %}border-red-200 bg-red-50 text-red-700{% else %}border-emerald-200 bg-emerald-50 text-emerald-700{% endif %}">
                             {{ message }}
                         </div>
                     {% endfor %}
@@ -80,11 +81,29 @@
         {% block content %}{% endblock %}
     </main>
 
+    <footer class="border-t border-slate-200 bg-white">
+        <div class="mx-auto grid max-w-6xl gap-6 px-5 py-8 text-sm text-slate-500 md:grid-cols-3 lg:px-8">
+            <div>
+                <p class="font-semibold text-ink">Recruitment Fraud Detection</p>
+                <p class="mt-2">Analyze job descriptions, detect suspicious patterns, and monitor prediction activity from one place.</p>
+            </div>
+            <div>
+                <p class="font-semibold text-ink">Navigation</p>
+                <div class="mt-2 space-y-1">
+                    <p><a href="{% if current_user %}{{ url_for('index') }}{% else %}{{ url_for('user_signin') }}{% endif %}" class="transition hover:text-brand-600">Prediction</a></p>
+                    <p><a href="{% if current_user %}{{ url_for('dashboard') }}{% else %}{{ url_for('admin_signin') }}{% endif %}" class="transition hover:text-brand-600">Dashboard</a></p>
+                    <p><a href="{{ url_for('user_signin') }}" class="transition hover:text-brand-600">Sign In</a></p>
+                </div>
+            </div>
+            <div>
+                <p class="font-semibold text-ink">Access</p>
+                <p class="mt-2">Demo credentials are available on the sign-in screens for quick testing.</p>
+            </div>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     {% block extra_scripts %}{% endblock %}
-    <footer class="mx-auto max-w-7xl px-6 pb-8 pt-2 text-xs text-slate-500 lg:px-8">
-        Academic demo interface for recruitment fraud detection using NLP, TF-IDF, and supervised machine learning.
-    </footer>
 </body>
 </html>
