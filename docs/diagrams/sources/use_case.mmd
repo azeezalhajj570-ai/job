@@ -1,0 +1,17 @@
+%% Consistent Mermaid source for editing
+flowchart LR
+    user([User])
+    admin([Admin])
+    signin((Sign in))
+    predict((Submit job text))
+    signals((Review detection signals))
+    overview((View model overview))
+    dashboard((Review dashboard))
+    api((Call JSON prediction API))
+    user --> signin
+    user --> predict
+    user --> signals
+    user --> overview
+    admin --> signin
+    admin --> dashboard
+    admin --> api

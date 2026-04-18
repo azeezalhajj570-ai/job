@@ -1,0 +1,12 @@
+flowchart TD
+    start([Start]) --> auth[User signs in]
+    auth --> submit[Submit job description]
+    submit --> validate{Text present?}
+    validate -- No --> error[Show validation message]
+    validate -- Yes --> clean[Normalize and clean text]
+    clean --> vectorize[TF-IDF transform]
+    vectorize --> classify[Run trained classifier]
+    classify --> persist[Store prediction in SQLite]
+    persist --> show[Show label, confidence, and terms]
+    error --> end([End])
+    show --> end

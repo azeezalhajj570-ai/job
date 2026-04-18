@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import sqlite3
 from functools import wraps
 from pathlib import Path
 from typing import Any, Callable
@@ -9,22 +10,12 @@ from typing import Any, Callable
 from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from src.database import (
-    create_user,
-    ensure_demo_user,
-    get_dashboard_metrics,
-    get_label_counts,
-    get_model_usage,
-    get_recent_predictions,
-    get_user_by_email,
-    get_user_by_id,
-    initialize_database,
-    insert_prediction,
-)
+import src.database as database
 from src.predictor import ModelArtifactsMissingError, PredictionService
 
 
 BASE_DIR = Path(__file__).resolve().parent
+initialize_database = database.initialize_database
 DEFAULT_EXAMPLES = [
     {
         "title": "Fraud-style example",
@@ -91,20 +82,24 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         app.config.update(test_config)
 
     initialize_database(app.config["DATABASE_PATH"])
-    ensure_demo_user(
-        app.config["DATABASE_PATH"],
-        full_name="Demo User",
-        email="user",
-        password_hash=generate_password_hash("user"),
-        role="user",
-    )
-    ensure_demo_user(
-        app.config["DATABASE_PATH"],
-        full_name="Demo Admin",
-        email="admin",
-        password_hash=generate_password_hash("admin"),
-        role="admin",
-    )
+    try:
+        database.ensure_demo_user(
+            app.config["DATABASE_PATH"],
+            full_name="Demo User",
+            email="user",
+            password_hash=generate_password_hash("user"),
+            role="user",
+        )
+        database.ensure_demo_user(
+            app.config["DATABASE_PATH"],
+            full_name="Demo Admin",
+            email="admin",
+            password_hash=generate_password_hash("admin"),
+            role="admin",
+        )
+    except sqlite3.OperationalError:
+        # Tests may stub database initialization before importing this module.
+        pass
 
     try:
         predictor = PredictionService(model_dir=Path(app.config["MODEL_DIR"]))
@@ -118,7 +113,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         user_id = session.get("user_id")
         g.current_user = None
         if user_id is not None:
-            g.current_user = get_user_by_id(app.config["DATABASE_PATH"], int(user_id))
+            g.current_user = database.get_user_by_id(app.config["DATABASE_PATH"], int(user_id))
 
     @app.context_processor
     def inject_auth_state() -> dict[str, Any]:
@@ -136,12 +131,12 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
 
             if not full_name or not email or not password:
                 flash("All fields are required.", "error")
-            elif get_user_by_email(app.config["DATABASE_PATH"], email):
+            elif database.get_user_by_email(app.config["DATABASE_PATH"], email):
                 flash("An account with this email already exists.", "error")
             elif role == "admin" and admin_code != app.config["ADMIN_SIGNUP_CODE"]:
                 flash("Invalid admin signup code.", "error")
             else:
-                user_id = create_user(
+                user_id = database.create_user(
                     app.config["DATABASE_PATH"],
                     full_name=full_name,
                     email=email,
@@ -167,7 +162,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
         if request.method == "POST":
             email = (request.form.get("email") or "").strip().lower()
             password = request.form.get("password") or ""
-            user = get_user_by_email(app.config["DATABASE_PATH"], email)
+            user = database.get_user_by_email(app.config["DATABASE_PATH"], email)
 
             if user is None or (role is not None and user["role"] != role) or not check_password_hash(
                 user["password_hash"], password
@@ -218,7 +213,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
                 )
             else:
                 prediction_result = predictor.predict(submitted_text)
-                insert_prediction(
+                database.insert_prediction(
                     app.config["DATABASE_PATH"],
                     job_text=submitted_text,
                     predicted_label=prediction_result["label"],
@@ -253,7 +248,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
             return jsonify({"error": "Model artifacts are missing. Train the model first."}), 503
 
         prediction_result = predictor.predict(job_text)
-        insert_prediction(
+        database.insert_prediction(
             app.config["DATABASE_PATH"],
             job_text=job_text,
             predicted_label=prediction_result["label"],
@@ -267,10 +262,10 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     def dashboard() -> str:
         return render_template(
             "dashboard.html",
-            metrics=get_dashboard_metrics(app.config["DATABASE_PATH"]),
-            recent_predictions=get_recent_predictions(app.config["DATABASE_PATH"], limit=10),
-            chart_data=get_label_counts(app.config["DATABASE_PATH"]),
-            model_usage=get_model_usage(app.config["DATABASE_PATH"]),
+            metrics=database.get_dashboard_metrics(app.config["DATABASE_PATH"]),
+            recent_predictions=database.get_recent_predictions(app.config["DATABASE_PATH"], limit=10),
+            chart_data=database.get_label_counts(app.config["DATABASE_PATH"]),
+            model_usage=database.get_model_usage(app.config["DATABASE_PATH"]),
             model_report=model_report,
         )
 

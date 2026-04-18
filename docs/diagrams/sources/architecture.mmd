@@ -1,0 +1,12 @@
+flowchart LR
+    browser[Browser]
+    flask[Flask routes and templates]
+    predictor[PredictionService]
+    preprocess[data_preprocessing]
+    model[(joblib model + TF-IDF vectorizer)]
+    db[(SQLite predictions.db)]
+    browser --> flask
+    flask --> predictor
+    predictor --> preprocess
+    predictor --> model
+    flask --> db

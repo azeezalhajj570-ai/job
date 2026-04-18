@@ -1,55 +1,65 @@
 # Recruitment Fraud Detection in Online Job Portals
 
-This project implements the proposal as a complete Flask application backed by an NLP and machine-learning pipeline for classifying online job posts as `Fraudulent` or `Legitimate`.
+This repository implements a graduation-level applied project that detects fraudulent recruitment posts from text input. The system combines a Flask web application, an SQLite persistence layer, and a scikit-learn text-classification pipeline built around TF-IDF features.
 
-## What the project includes
+## What is implemented
 
-- Text preprocessing with lowercasing, punctuation and number removal, stop-word filtering, and whitespace normalization
-- TF-IDF feature extraction with unigram and bigram support
-- Model comparison across Logistic Regression, Naive Bayes, SVM, and Random Forest
-- Automatic best-model selection using F1 score, cross-validation support, and stored evaluation metrics
-- Flask web application with shared sign-in, role-based redirects, and user/admin accounts
-- Multi-page frontend with Overview, Predict, Signals, and Dashboard pages
-- Responsive Tailwind CSS interface with a mobile sidebar menu and desktop top navigation
-- Monitoring dashboard for administrators with fraud rate, confidence averages, model usage, and recent activity
-- SQLite logging of every analyzed posting
-- Generated graduation documentation in `.docx` format with diagrams and chaptered report content
-- Automated tests for preprocessing, persistence, prediction, and Flask routes
+- Shared sign-in and sign-up flows for normal users and administrators
+- Role-protected routes for prediction and dashboard access
+- Text preprocessing with lowercasing, punctuation removal, number removal, stop-word filtering, and whitespace normalization
+- Model comparison across Logistic Regression, Naive Bayes, Support Vector Machine, and Random Forest
+- Automatic best-model selection with saved metrics and metadata
+- Web pages for overview, prediction, detection signals, and the administrator dashboard
+- SQLite logging of prediction results
+- Automated tests for preprocessing, database logic, predictor behavior, and Flask routes
+- Submission assets for diagrams, screenshots, audit notes, and the editable final DOCX report
 
-## Project structure
+## Repository structure
 
 ```text
 job/
 ├── app.py
 ├── requirements.txt
 ├── data/
-│   ├── sample_job_postings.csv
-│   └── sample_jobs.csv
+├── docs/
+├── models/
+├── scripts/
 ├── src/
-│   ├── data_preprocessing.py
-│   ├── database.py
-│   ├── predictor.py
-│   └── train_model.py
-├── templates/
 ├── static/
+├── submission/
+├── templates/
 └── tests/
 ```
 
+## Core files
+
+- `app.py`: Flask app factory, routes, authentication, and page rendering
+- `src/data_preprocessing.py`: dataset loading, text cleaning, and label normalization
+- `src/train_model.py`: model training, evaluation, and artifact persistence
+- `src/predictor.py`: runtime inference service
+- `src/database.py`: SQLite schema and dashboard queries
+- `scripts/capture_screenshots.py`: Playwright-based screenshot capture
+- `scripts/build_submission_assets.py`: generates UML assets, markdown docs, and `submission/Project_Report.docx`
+
 ## Dataset expectations
 
-The training CSV should contain:
+The training script expects:
 
 - A text column such as `description`, `job_description`, `job_text`, `text`, or `content`
 - A target column such as `fraudulent`, `is_fraud`, `label`, `target`, or `class`
 
-Optional columns such as `title`, `company`, `location`, `requirements`, and `benefits` are merged into the training text when present.
+Optional context columns such as `title`, `company`, `location`, `requirements`, and `benefits` are merged into the training text when they are present.
 
 ## Setup
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt python-docx playwright
+```
+
+If you need browser-based screenshot capture, install Chromium for Playwright in a writable location:
+
+```bash
+env PLAYWRIGHT_BROWSERS_PATH=/tmp/ms-playwright python -m playwright install chromium
 ```
 
 ## Train the model
@@ -58,34 +68,32 @@ pip install -r requirements.txt
 python -m src.train_model --data data/sample_job_postings.csv --model-dir models
 ```
 
-Training generates:
+Artifacts written by training:
 
 - `models/fraud_detector.joblib`
 - `models/tfidf_vectorizer.joblib`
 - `models/model_metrics.json`
 - `models/model_metadata.json`
 
-## Run the app
+## Run the application
 
 ```bash
 python app.py
 ```
 
-Open:
+The default local URL is `http://127.0.0.1:5003`.
 
-- `http://127.0.0.1:5000/` redirects to the correct page after sign-in
-- `http://127.0.0.1:5000/signin` for shared sign in
-- `http://127.0.0.1:5000/signup` for user sign up
-- `http://127.0.0.1:5000/admin/signup` for admin sign up
+Key routes:
 
-Main application pages:
+- `/signin`
+- `/signup`
+- `/overview`
+- `/predict`
+- `/signals`
+- `/dashboard`
+- `/api/predict`
 
-- `/overview` for system summary and quick metrics
-- `/predict` for job-post classification
-- `/signals` for fraud and legitimate content indicators
-- `/dashboard` for admin monitoring
-
-Demo accounts:
+Demo accounts created automatically:
 
 - User: `user` / `user`
 - Admin: `admin` / `admin`
@@ -93,33 +101,43 @@ Demo accounts:
 ## Run tests
 
 ```bash
-pytest
+pytest -q
 ```
 
-## Proposal alignment
+## Build the report deliverables
 
-The implementation maps directly to the proposal:
+1. Train the model.
+2. Start the Flask application.
+3. Capture screenshots:
 
-- Intelligent job post analysis: NLP preprocessing, TF-IDF, and multiple ML classifiers
-- Web-based prediction platform: Flask UI for manual prediction, shared authentication, multi-page navigation, and JSON API support
-- Fraud detection monitoring dashboard: summary metrics, chart data, model usage, recent predictions, and admin-only access
-- Quality assurance: automated tests plus cross-validation metrics in the training workflow
+   ```bash
+   env PLAYWRIGHT_BROWSERS_PATH=/tmp/ms-playwright python scripts/capture_screenshots.py
+   ```
 
-## Documentation
+4. Generate diagrams, markdown documentation, and the final editable report:
 
-The graduation report is generated at:
+   ```bash
+   python scripts/build_submission_assets.py
+   ```
 
-- `docs/Recruitment_Fraud_Detection_Graduation_Report.docx`
+Main outputs:
 
-Regenerate it with:
+- `submission/Project_Report.docx`
+- `docs/00_project_audit.md`
+- `docs/01_missing_documentation_gaps.md`
+- `docs/PROJECT_SUBMISSION_CHECKLIST.md`
+- `docs/diagrams/*.png`
+- `docs/diagrams/sources/*.mmd`
+- `docs/screenshots/*.png`
 
-```bash
-python scripts/generate_graduation_report.py
-```
+## Current model note
 
-## Future extensions
+The bundled demonstration dataset is very small. The persisted metrics are useful for verifying the pipeline and explaining the workflow, but they should not be presented as strong evidence of production-level performance.
 
-- Integrate live job portal APIs
-- Add multilingual processing
-- Evaluate transformer-based classifiers
-- Add analyst review workflows and exportable reports
+## Current limitations
+
+- No live recruitment-platform API integration
+- No multilingual processing
+- No deep-learning or transformer-based classifier
+- No image, link, or attachment analysis
+- No user-to-prediction ownership link in the current SQLite schema

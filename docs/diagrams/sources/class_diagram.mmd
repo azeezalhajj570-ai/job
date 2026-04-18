@@ -1,0 +1,31 @@
+classDiagram
+    class PredictionService {
+        +predict(text)
+        -_extract_supporting_terms(transformed_text)
+        -_build_risk_summary(label, supporting_terms)
+    }
+    class DatasetBundle {
+        +texts
+        +labels
+        +text_column
+        +target_column
+    }
+    class Users {
+        +id
+        +full_name
+        +email
+        +password_hash
+        +role
+        +created_at
+    }
+    class Predictions {
+        +id
+        +job_text
+        +predicted_label
+        +model_name
+        +confidence
+        +input_length
+        +created_at
+    }
+    PredictionService --> Predictions
+    Users --> Predictions

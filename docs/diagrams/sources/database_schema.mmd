@@ -1,0 +1,18 @@
+erDiagram
+    USERS {
+        int id PK
+        string full_name
+        string email
+        string password_hash
+        string role
+        datetime created_at
+    }
+    PREDICTIONS {
+        int id PK
+        text job_text
+        string predicted_label
+        string model_name
+        float confidence
+        int input_length
+        datetime created_at
+    }

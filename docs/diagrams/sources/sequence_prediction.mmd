@@ -1,0 +1,11 @@
+sequenceDiagram
+    actor User
+    participant FlaskUI
+    participant PredictionService
+    participant SQLite
+    User->>FlaskUI: Submit job description
+    FlaskUI->>PredictionService: predict(text)
+    PredictionService-->>FlaskUI: label, confidence, terms
+    FlaskUI->>SQLite: insert_prediction(...)
+    SQLite-->>FlaskUI: persisted row
+    FlaskUI-->>User: Render result page
